@@ -1,4 +1,4 @@
-function askAI() {
+async function askAI() {
   const question = document.getElementById("question").value;
   const answerDiv = document.getElementById("answer");
 
@@ -9,11 +9,32 @@ function askAI() {
 
   answerDiv.innerHTML = "🤖 Thinking...";
 
-  // Temporary fake AI response
-  setTimeout(() => {
+  const API_KEY = "AlzaSyAld9j285BgrsAjklF8TySu9RH1lXiJl9Q";
+
+  try {
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + API_KEY,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: question }]
+            }
+          ]
+        })
+      }
+    );
+
+    const data = await response.json();
     answerDiv.innerHTML =
-      "This is a demo response.<br><br>" +
-      "Your question was:<br><b>" + question + "</b><br><br>" +
-      "Next step: connect real AI.";
-  }, 1000);
+      data.candidates[0].content.parts[0].text;
+
+  } catch (error) {
+    console.error(error);
+    answerDiv.innerHTML = "⚠️ Error connecting to AI.";
+  }
 }
